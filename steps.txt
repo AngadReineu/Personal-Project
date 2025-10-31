@@ -1,0 +1,13 @@
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/AngadReineu/my-webstie.git
+git push -u origin main
+
+---------------------------------
+or if you already have an existing project and just want to push it:
+
+git remote add origin https://github.com/eacademy1/qr-gen-backend.git
+git branch -M main
+git push -u origin main
