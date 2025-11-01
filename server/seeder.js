@@ -14,15 +14,15 @@ mongoose.connect(process.env.MONGO_URI);
 
 const seedData = async ()=>{
     try {
-        // clear the prev data
-        await Product.deleteMany();
-        await User.deleteMany();
-        await Cart.deleteMany();
+        // // clear the prev data
+        // await Product.deleteMany();
+        // await User.deleteMany();
+        // await Cart.deleteMany();
         //create a default admin user
 
         const createdUser = await User.create({
             name: "Admin User",
-            email:"admin@exmaple.com",
+            email:"admin@example.com",
             password: "admin@123",
             role: "admin",
         });
@@ -50,3 +50,29 @@ const seedData = async ()=>{
 };
 
 seedData()
+// const seedData = async () => {
+//   try {
+//     // check if admin already exists
+//     const existingAdmin = await User.findOne({ email: "admin@example.com" });
+//     if (existingAdmin) {
+//       console.log("Admin already exists");
+//       process.exit();
+//     }
+
+//     // create admin
+//     const createdUser = await User.create({
+//       name: "Admin User",
+//       email: "admin@example.com",
+//       password: "admin@123",
+//       role: "admin",
+//     });
+
+//     console.log("✅ Admin user created:", createdUser.email);
+//     process.exit();
+//   } catch (error) {
+//     console.error("❌ Seeding error:", error);
+//     process.exit(1);
+//   }
+// };
+
+// seedData();

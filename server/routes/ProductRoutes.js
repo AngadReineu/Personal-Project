@@ -158,15 +158,15 @@ router.delete("/:id", protect, admin, async (req, res) => {
 // @desc Delete all products (admin only)
 // @access Private (Admin)
 router.delete("/", protect, admin, async (req, res) => {
-  try {
-    const result = await Product.deleteMany({});
-    res.json({
-      message: `🧹 ${result.deletedCount} products deleted successfully!`,
-    });
-  } catch (error) {
-    console.error("Bulk deletion error:", error);
-    res.status(500).json({ message: "Server Error", error: error.message });
-  }
+    try {
+        const result = await Product.deleteMany({});
+        res.json({
+            message: `🧹 ${result.deletedCount} products deleted successfully!`,
+        });
+    } catch (error) {
+        console.error("Bulk deletion error:", error);
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
 });
 
 
@@ -175,88 +175,115 @@ router.delete("/", protect, admin, async (req, res) => {
 //@acess public
 
 router.get("/", async (req, res) => {
-    try {
-        const { collection, size, color, gender, material, minPrice, maxPrice, sortBy, search, category, brand, limit } = req.query;
-        let query = {};
-        //filter logic
+  try {
+    const {
+      collection,
+      size,
+      color,
+      gender,
+      material,
+      minPrice,
+      maxPrice,
+      sortBy,
+      search,
+      category,
+      brand,
+      limit,
+    } = req.query;
 
-        if (collection && collection.toLocaleLowerCase() !== "all") {
-            query.collections = collection;
-        }
-        if (category && category.toLocaleLowerCase() !== "all") {
-            query.category = category;
-        }
-        if (material) {
-            query.material = { $in: material.split(",") };
-        }
-        if (brand) {
-            query.brand = { $in: brand.split(",") };
-        }
-        if (size) {
-            query.size = { $in: size.split(",") };
-        }
-        if (color) {
-            query.colors = { $in: [color] };
-        }
-        if (gender && gender.toLowerCase() !== "all") {
-            query.gender = gender;
-        }
+    let query = {};
 
-        if (minPrice || maxPrice) {
-            query.price = {};
-            if (minPrice) query.price.$gte = Number(minPrice);
-            if (maxPrice) query.price.$lte = Number(maxPrice);
-        }
-
-        if (search) {
-            query.name = { $regex: search, $options: "i" }; // case-insensitive search
-            query.description = { $regex: search, $options: "i" }; // case-insensitive search
-        }
-
-        // 🔹 Build query
-        let productQuery = Product.find(query);
-
-        // 🔹 Sorting
-        if (sortBy) {
-            switch (sortBy) {
-                case "priceAsc":
-                case "price_low_high":
-                    productQuery = productQuery.sort({ price: 1 });
-                    break;
-
-                case "priceDesc":
-                case "price_high_low":
-                    productQuery = productQuery.sort({ price: -1 });
-                    break;
-
-                case "newest":
-                    productQuery = productQuery.sort({ createdAt: -1 });
-                    break;
-
-                case "oldest":
-                    productQuery = productQuery.sort({ createdAt: 1 });
-                    break;
-
-                default:
-                    // no sorting if query doesn't match known options
-                    break;
-            }
-        }
-
-        // 🔹 Limit results (e.g., for homepage sections)
-        if (limit) {
-            productQuery = productQuery.limit(Number(limit));
-        }
-
-        // 🔹 Execute query
-        const products = await productQuery;
-
-        res.json(products);
-    } catch (error) {
-        console.error("Get products error:", error);
-        res.status(500).json({ message: "Server Error", error: error.message });
+    // ✅ Normalization mappings
+    if (req.query.gender) {
+      const genderMap = {
+        male: "Men",
+        men: "Men",
+        female: "Women",
+        women: "Women",
+      };
+      query.gender =
+        genderMap[req.query.gender.toLowerCase()] || req.query.gender;
     }
+
+    if (req.query.category) {
+      const categoryMap = {
+        "top class": "Top Wear",
+        "bottom class": "Bottom Wear",
+      };
+      query.category =
+        categoryMap[req.query.category.toLowerCase()] || req.query.category;
+    }
+
+    // Existing filter logic
+    if (collection && collection.toLocaleLowerCase() !== "all") {
+      query.collections = collection;
+    }
+    if (category && category.toLocaleLowerCase() !== "all") {
+      query.category = category;
+    }
+    if (material) {
+      query.material = { $in: material.split(",") };
+    }
+    if (brand) {
+      query.brand = { $in: brand.split(",") };
+    }
+    if (size) {
+      query.size = { $in: size.split(",") };
+    }
+    if (color) {
+      query.colors = { $in: [color] };
+    }
+    if (gender && gender.toLowerCase() !== "all") {
+      query.gender = gender;
+    }
+
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+      query.description = { $regex: search, $options: "i" };
+    }
+
+    console.log("🧩 Final Query Object:", query);
+
+    let productQuery = Product.find(query);
+
+    // Sorting
+    if (sortBy) {
+      switch (sortBy) {
+        case "priceAsc":
+        case "price_low_high":
+          productQuery = productQuery.sort({ price: 1 });
+          break;
+        case "priceDesc":
+        case "price_high_low":
+          productQuery = productQuery.sort({ price: -1 });
+          break;
+        case "newest":
+          productQuery = productQuery.sort({ createdAt: -1 });
+          break;
+        case "oldest":
+          productQuery = productQuery.sort({ createdAt: 1 });
+          break;
+      }
+    }
+
+    if (limit) {
+      productQuery = productQuery.limit(Number(limit));
+    }
+
+    const products = await productQuery;
+    res.json(products);
+  } catch (error) {
+    console.error("Get products error:", error);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
 });
+
 //@route GET /api/product/best-seller
 // @desc Retrieve the Product with the highest Rating
 //@access public
@@ -279,13 +306,13 @@ router.get("/best-seller", async (req, res) => {
 //@desc Retrieve latest 8 products -creation date
 // @access Public
 
-router.get("/new-arrivals", async(req,res)=>{
+router.get("/new-arrivals", async (req, res) => {
     //fetch latest products using created at dates
     try {
-        const newArrival = await Product.find().sort({createdAt: -1}).limit(8);
+        const newArrival = await Product.find().sort({ createdAt: -1 }).limit(8);
         res.json(newArrival);
     } catch (error) {
-         console.error("Get products error:", error);
+        console.error("Get products error:", error);
         res.status(500).json({ message: "Server Error", error: error.message });
     }
 })
