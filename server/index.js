@@ -16,6 +16,9 @@ const AdminUpload = require("./routes/AdminUpload")
 const razorpayRoutes = require("./routes/RazorPayRouter")
 
 const app = express();
+// 🧩 Use these BEFORE routes:
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(express.json()) // our server is apble to work with the json data
 
 app.use(cors()); // to communication with frontend port
@@ -49,7 +52,7 @@ app.use("/api/admin/products", productAdminRoute)
 app.use("/api/admin/orders", AdminOrderRouter)
 app.use("/api/upload", uploadRoute)
 
-app.use("/api/admin/admin-upload", AdminUpload)
+app.use("/api/admin/products/upload", AdminUpload)
 
 app.listen(PORT, ()=>{
     console.log(`Server is Running on https://localhost:${PORT}`);

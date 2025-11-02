@@ -6,26 +6,26 @@ const USER_TOKEN = `Bearer ${localStorage.getItem("userToken")}`
 //async thunk to fetch admin products
 
 export const fetchAdminProducts = createAsyncThunk("adminProducts/fetchAdminProducts", async () => {
-    const response = await axios.get(`${API_URL}/api/admin/products`, {
-        headers: {
-            Authorization: USER_TOKEN,
-        }
-    });
-    return response.data
+  const response = await axios.get(`${API_URL}/api/admin/products`, {
+    headers: {
+      Authorization: USER_TOKEN,
+    }
+  });
+  return response.data
 })
 
 //async function to create a new product
 
 export const createProduct = createAsyncThunk("adminProducts/createProduct", async (productData) => {
-    const response = await axios.post(`${API_URL}/api/admin/products`,
-        productData,
-        {
-            headers:{
-                Authorization: USER_TOKEN,
-            }
-        }
-    );
-    return response.data;
+  const response = await axios.post(`${API_URL}/api/admin/products`,
+    productData,
+    {
+      headers: {
+        Authorization: USER_TOKEN,
+      }
+    }
+  );
+  return response.data;
 })
 
 //async thunk to update an existing product
@@ -55,16 +55,37 @@ export const updateProduct = createAsyncThunk(
 
 // to delete the product
 
-export const deleteProduct = createAsyncThunk("adminProducts/deleteProduct",async(id)=>{
-     await axios.delete(`${API_URL}/api/products/${id}`,
-        {
-            headers:{
-                Authorization: USER_TOKEN,
-            }
-        }
-    );
-    return id;
+export const deleteProduct = createAsyncThunk("adminProducts/deleteProduct", async (id) => {
+  await axios.delete(`${API_URL}/api/products/${id}`,
+    {
+      headers: {
+        Authorization: USER_TOKEN,
+      }
+    }
+  );
+  return id;
 });
+// ✅ Async thunk to create a new product
+export const addProduct = createAsyncThunk(
+  "adminProducts/addProduct",
+  async (productData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/admin/products/upload`,
+        productData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to create product");
+    }
+  }
+);
 
 const adminProductSlice = createSlice({
   name: "adminProducts",
@@ -72,7 +93,7 @@ const adminProductSlice = createSlice({
     products: [],
     loading: false,
     error: null,
-    
+
   },
   reducers: {
   },
@@ -106,31 +127,43 @@ const adminProductSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
+      // ✅ Add Product
+      .addCase(addProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.products.push(action.payload);
+      })
+      .addCase(addProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       // Update
       .addCase(updateProduct.fulfilled, (state, action) => {
-       const index = state.products.findIndex(
-        (product)=> product._id === action.payload._id
-       );
-       if(index !== -1){
-        state.products[index] = action.payload;
-       }
+        const index = state.products.findIndex(
+          (product) => product._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.products[index] = action.payload;
+        }
       })
-      .addCase(updateProduct.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+    .addCase(updateProduct.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    })
 
-      // Delete
-      .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.loading = false;
-        state.products = state.products.filter((p) => p._id !== action.payload);
-      })
-      .addCase(deleteProduct.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
-  },
+    // Delete
+    .addCase(deleteProduct.fulfilled, (state, action) => {
+      state.loading = false;
+      state.products = state.products.filter((p) => p._id !== action.payload);
+    })
+    .addCase(deleteProduct.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+},
 });
 
 export default adminProductSlice.reducer;
