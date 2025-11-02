@@ -1,18 +1,28 @@
 
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom';
+import { addUser, deleteUser, fetchUsers, updateUser } from '../../redux/slice/adminSlice';
 
 const UserManagement = () => {
 
-    const users = [
-        {
-            _id:123,
-            name: "xyz",
-            email: "xyz@gmail.com",
-            role: 'admin'
-        },
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const{user} = useSelector((state)=> state.auth);
+    const{users, loading,error} = useSelector((state)=> state.admin);
 
-    ];
+    useEffect(()=>{
+        if(user && user.role !== "admin"){
+            navigate("/");
+        }
+    },[user,navigate])
+    
+    useEffect(()=>{
+        if(user && user.role === "admin"){
+            dispatch(fetchUsers());
+        }
+    },[dispatch,user])
 
     const [formData, setFormData] = useState({
         name: "",
@@ -30,6 +40,7 @@ const UserManagement = () => {
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
+        dispatch(addUser(formData))
         
         setFormData({ // to reset the form after 
             name: "",
@@ -38,18 +49,17 @@ const UserManagement = () => {
             role: "customer",
         })
     }
-
+    
+    const handleRoleChange = (userId, newRole)=>{
+        dispatch(updateUser({id: userId, role: newRole}));
+        
+    };
     const handleDeleteUser=(userId)=>{
         if(window.confirm("Are you Sure you want to Delete this User?")){
-            console.log("Deleting user with ID", userId);
-            
+            dispatch(deleteUser(userId))
         }
     }
 
-    const handleRoleChange = (userId, newRole)=>{
-        console.log({id:userId, role:newRole});
-        
-    };
 
 
 
@@ -58,6 +68,8 @@ const UserManagement = () => {
         <div className='max-w-7xl mx-auto p-6'>
             <h2 className="text-2xl font-bold mb-6">User Management</h2>
             {/* user form */}
+            {loading && <p>Loading...</p>}
+            {error && <p>Error:{error}</p>}
             <div className="p-6 rounded-lg mb-6">
                 <h3 className='text-lg font-bold mb-4'>
                     Add New User

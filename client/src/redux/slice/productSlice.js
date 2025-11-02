@@ -40,6 +40,20 @@ export const fetchProductByFilter = createAsyncThunk(
 
         console.log("🛰️ Fetching products with filters...");
         console.log("✅ Response data:", response.data);
+       console.log("📤 Sending filters to backend:", {
+  collection,
+  size,
+  color,
+  gender,
+  minPrice,
+  maxPrice,
+  sortBy,
+  search,
+  category,
+  material,
+  brand,
+  limit,
+});
         return response.data;
 
     }

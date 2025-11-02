@@ -1,25 +1,25 @@
-import {RiDeleteBin3Line} from "react-icons/ri" 
+import { RiDeleteBin3Line } from "react-icons/ri"
 import { useDispatch } from "react-redux";
 import { removeFromCart, updateCartItemQuantity } from "../../redux/slice/cartSlice";
 
 
-function CartContent({userId, guestId, cart}) {
+function CartContent({ userId, guestId, cart }) {
     const dispatch = useDispatch();
 
     //handle adding or substracting to cart
 
-    const handleAddToCart = (productId,delta,quantity,size,color)=>{
-        const newQuantity = quantity+ delta;
-        if(newQuantity>=1){
+    const handleAddToCart = (productId, delta, quantity, size, color) => {
+        const newQuantity = quantity + delta;
+        if (newQuantity >= 1) {
             dispatch(updateCartItemQuantity({
-                productId, quantity, newQuantity, guestId,userId, size,color
+                productId, quantity: newQuantity, guestId, userId, size, color,
             }))
         }
     };
-    const handleRemoveFromCart = (productId,size,color)=>{
-        dispatch(removeFromCart({productId, guestId , userId,size,color}))
+    const handleRemoveFromCart = (productId, size, color) => {
+        dispatch(removeFromCart({ productId, guestId, userId, size, color }))
     }
-  
+
     return (
         <div>
             {
@@ -36,20 +36,25 @@ function CartContent({userId, guestId, cart}) {
                                     size:{product.size} | color: {product.color}
                                 </p>
                                 <div className="flex items-center mt-2">
-                                    <button onClick={()=>handleAddToCart(product.productId, -1,product.quantity,product.size,product.color)} className="border rounded px-2 py-1 text-xl font-medium">
+                                    <button
+                                        onClick={() => handleAddToCart(product.productId, -1, product.quantity, product.size, product.color)}
+                                        className="border rounded px-2 py-1 text-xl font-medium"
+                                    >
                                         -
                                     </button>
                                     <span className="mx-4">{product.quantity}</span>
-                                    <button onClick={()=>handleRemoveFromCart(product.productId, 1,product.quantity,product.size,product.color)} className="border rounded px-2 py-1 text-xl font-medium">
+                                    <button onClick={() => handleAddToCart(product.productId, 1, product.quantity, product.size, product.color)} className="border rounded px-2 py-1 text-xl font-medium">
                                         +
                                     </button>
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <p>${product.price.toLocaleString()}</p>
-                            <button onClick={()=>handleAddToCart(product.productId,product.size,product.color)}>
-                                <RiDeleteBin3Line className=" h-6 w-6 mt-2 text-red-600"/>
+                            <p>${(product.price * product.quantity).toLocaleString()}</p>
+                            <button
+                                onClick={() => handleRemoveFromCart(product.productId, product.size, product.color)}
+                            >
+                                <RiDeleteBin3Line className="h-6 w-6 mt-2 text-red-600" />
                             </button>
                         </div>
                     </div>

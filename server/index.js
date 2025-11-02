@@ -13,6 +13,7 @@ const AdminRoute = require("./routes/AdminRoute")
 const productAdminRoute = require("./routes/ProductAdminRouter")
 const AdminOrderRouter = require("./routes/AdminOrderRouter")
 const AdminUpload = require("./routes/AdminUpload")
+const razorpayRoutes = require("./routes/RazorPayRouter")
 
 const app = express();
 app.use(express.json()) // our server is apble to work with the json data
@@ -29,6 +30,7 @@ app.get("/", (req,res)=>{
     res.send("WELCOME TO THE WEBSITE API!")
 })
 
+
 // api routes starts here
 
 app.use("/api/users", userRoutes)
@@ -37,11 +39,12 @@ app.use("/api/cart", cartRoute)
 app.use("/api/checkout", checkoutRoute)
 app.use("/api/orders", orderRoute)
 app.use("/api", subscriberRoute)
+app.use("/api/razorpay", razorpayRoutes)
 
 
 // api for admin routes
 
-app.use("/api/admin/users", AdminRoute)
+app.use("/api/admin/user", AdminRoute)
 app.use("/api/admin/products", productAdminRoute)
 app.use("/api/admin/orders", AdminOrderRouter)
 app.use("/api/upload", uploadRoute)

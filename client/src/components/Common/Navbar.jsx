@@ -12,6 +12,7 @@ function NavBar() {
     const [draw, setDraw] = useState(false);
     const [navDrawerOpen, setNavDrawerOpen] = useState(false);
     const { cart } = useSelector((state) => state.cart);
+    const {user} = useSelector((state)=> state.auth)
 
     const cartItemCount = cart?.products?.reduce((total, product) => total + product.quantity, 0) ||
         0;
@@ -48,7 +49,16 @@ function NavBar() {
                     <Link to="/collections/all?category=Bottom Wear" className="text-gray-700 hover:text-black text-sm font-medium uppercase">
                         Bottom Wear
                     </Link>
-                    <Link to="/admin" className=" block bg-red rounded text-white hover:text-black text-sm font-medium px-2 uppercase">Admin </Link>
+                    <Link to="/collections/all" className="text-gray-700 hover:text-black text-sm font-medium uppercase">
+                        All Collection
+                    </Link>
+                    <div>
+                        {user && user.role === "admin" &&(
+                            <Link to="/admin" className=" block bg-red rounded text-white hover:text-black text-sm font-medium px-2 uppercase">Admin </Link>
+                        )}
+                        
+                    </div>
+                    
                 </div>
                 {/* right icons section */}
                 <div className="flex items-center space-x-5">

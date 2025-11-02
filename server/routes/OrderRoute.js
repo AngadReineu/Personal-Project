@@ -8,16 +8,19 @@ const router = express.Router();
 // @desc get Logged-in user's Orders
 //@access Private
 
-router.get("/my-orders", protect,async(req,res)=>{
-    try {
-        //find order for authenticated user
-        const orders = (await Order.find({user: req.user._id})).sort({
-            createAt:-1,
-        }); //sort by most recent order
-        res.json(orders)
-    } catch (error) {
-        res.status(500).json({message:"Server Error"});
-    }
+router.get("/my-orders", protect, async (req, res) => {
+  try {
+    console.log("✅ My Orders route hit");
+    console.log("User from token:", req.user);
+
+    const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
+    console.log("Fetched orders:", orders);
+
+    res.json(orders);
+  } catch (error) {
+    console.error("❌ Error in /my-orders route:", error);
+    res.status(500).json({ message: "Server Error in /my-orders", error: error.message });
+  }
 });
 
 //@route GET /api/order/:id

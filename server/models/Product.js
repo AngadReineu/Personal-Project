@@ -56,59 +56,61 @@ const productSchema = new mongoose.Schema({
         required: true,
     },
     gender: {
-        type: String,
-        enum: ["Men", "Women", "Unisex"],
-    },
-    images: [{
-        url: {
-            type: String,
-            required: true
-        },
-        altText: {
-            type: String,
-        },
-    },],
-    isFeatured: {
-        type: Boolean,
-        default: false,
-    },
-    isPublished: {
-        type: Boolean,
-        default: false,
-
-    },
-    rating: {
-        type: Number,
-        default: 0,
-    },
-    numReviews: {
-        type: Number,
-        default: 0,
-    },
-    tags: [String],
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
-    metaTitle: {
-        type: String,
-    },
-    metaDescritpion: {
-        type: String,
-    },
-    metaKeywords: {
-        type: String,
-    },
-    dimensions: {
-        length: Number,
-        width: Number,
-        height: Number,
-
-    },
-    weight: Number,
-
+  type: String,
+  enum: ["Men", "Women", "Unisex"],
+  set: (v) => v.charAt(0).toUpperCase() + v.slice(1).toLowerCase(), // optional, keeps capitalization consistent
+  required: true
 },
+        images: [{
+            url: {
+                type: String,
+                required: true
+            },
+            altText: {
+                type: String,
+            },
+        },],
+        isFeatured: {
+            type: Boolean,
+            default: false,
+        },
+        isPublished: {
+            type: Boolean,
+            default: false,
+
+        },
+        rating: {
+            type: Number,
+            default: 0,
+        },
+        numReviews: {
+            type: Number,
+            default: 0,
+        },
+        tags: [String],
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        metaTitle: {
+            type: String,
+        },
+        metaDescritpion: {
+            type: String,
+        },
+        metaKeywords: {
+            type: String,
+        },
+        dimensions: {
+            length: Number,
+            width: Number,
+            height: Number,
+
+        },
+        weight: Number,
+
+    },
     { timestamps: true }
 );
 

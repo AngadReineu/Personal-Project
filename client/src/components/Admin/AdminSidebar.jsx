@@ -2,13 +2,20 @@
 
 import React, { useState } from 'react'
 import { FaBoxOpen, FaClipboardList, FaSignOutAlt, FaStore, FaUser } from 'react-icons/fa'
+import { useDispatch } from 'react-redux';
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { logout } from '../../redux/slice/authSlice';
+import { clearCart } from '../../redux/slice/cartSlice';
 
 const AdminSidebar = () => {
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
 
   const handleLogout =()=>{
+    dispatch(logout());
+    dispatch(clearCart());
     navigate("/")//for now
   }
 
@@ -46,7 +53,7 @@ const AdminSidebar = () => {
         </NavLink>
 
 
-        <NavLink to="/admin/shop" className={({isActive})=> isActive? "bg-gray-700 text-white py-3 px-4 rounded flex items-center selection space-x-2": "text-gray-300 hover:bg-gray-700 hover:text-white py-3 px-4 rounded flex items-center space-x-2"}>
+        <NavLink to="/" className={({isActive})=> isActive? "bg-gray-700 text-white py-3 px-4 rounded flex items-center selection space-x-2": "text-gray-300 hover:bg-gray-700 hover:text-white py-3 px-4 rounded flex items-center space-x-2"}>
         <FaStore />
         <span>Shop</span>
         </NavLink>

@@ -25,7 +25,7 @@ export const fetchAllOrder = createAsyncThunk("adminOrders/fetchAllOrder", async
 
 export const updateOrderStatus = createAsyncThunk("adminOrders/updateOrderStatus", async ({id,status}, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
+      const response = await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/orders/${id}`,
         {status},
         {
@@ -98,12 +98,10 @@ const adminOrderSlice = createSlice({
    
       // UPDATE ORDER STATUS
    
-      .addCase(updateOrderStatus.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      
       .addCase(updateOrderStatus.fulfilled, (state, action) => {
         const updatedOrder = action.payload;
+        
         const orderIndex = state.orders.findIndex(
         (order)=> order._id === action.payload._id
        );
@@ -112,26 +110,17 @@ const adminOrderSlice = createSlice({
        }
       })
   
-      .addCase(updateOrderStatus.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+      
 
       // =========================
       // DELETE ORDER
       // =========================
-      .addCase(deleteOrder.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      
       .addCase(deleteOrder.fulfilled, (state, action) => {
         state.loading = false;
         state.orders = state.orders.filter((order) => order._id !== action.payload);
       })
-      .addCase(deleteOrder.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
+     
   },
 });
 

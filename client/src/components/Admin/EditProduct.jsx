@@ -1,10 +1,19 @@
 
 
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MdDelete } from "react-icons/md"
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { fetchProductByDetails } from '../../redux/slice/productSlice';
+import { updateProduct } from '../../redux/slice/adminProductSlice';
+import axios from 'axios';
 
 const EditProduct = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const {id} = useParams();
+    const {selectedProduct, loading,error} = useSelector((state)=> state.products)
     const [productData, setProductData] = useState(
         {
             name: '',
@@ -17,20 +26,25 @@ const EditProduct = () => {
             sizes: [],
             colors: [],
             collection: '',
-            materail: '',
+            material: '',
             gender: '',
-            images: [
-                {
-                    url: "https://picsum.photos/150?random=1",
-                },
-                {
-                    url: "https://picsum.photos/150?random=2",
-                }
-            ]
+            images: []
 
         }
     );
+    const[uploading,setUploading] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
+    useEffect(()=>{
+        if(id){
+            dispatch(fetchProductByDetails(id));
+        }
+    },[dispatch, id ]);
+
+    useEffect(()=>{
+        if(selectedProduct){
+           setProductData(selectedProduct); 
+        }
+    },[selectedProduct])
 
 
     const handleChange = (e) => {
@@ -39,23 +53,53 @@ const EditProduct = () => {
     };
 
     const handleImageUpload = async (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setProductData((prev) => ({
-                ...prev,
-                images: [...prev.images, { url: reader.result }],
-            }));
-        };
-        reader.readAsDataURL(file);
-    };
+  // Show local preview instantly
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    setProductData((prev) => ({
+      ...prev,
+      images: [...prev.images, { url: reader.result, preview: true }],
+    }));
+  };
+  reader.readAsDataURL(file);
+
+  // Prepare form data for backend upload
+  const formData = new FormData();
+  formData.append("image", file);
+
+  try {
+    setUploading(true);
+    const { data } = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/api/upload`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    // Replace preview with uploaded image
+    setProductData((prev) => ({
+      ...prev,
+      images: prev.images
+        .filter((img) => !img.preview)
+        .concat({ url: data.imageUrl, altText: "" }),
+    }));
+  } catch (error) {
+    console.error("Image upload failed:", error);
+  } finally {
+    setUploading(false);
+  }
+};
+
 
 
     const handleFormEdit = (e) => {
         e.preventDefault();
-        console.log(productData);
+       dispatch(updateProduct({id,productData}));
+       navigate("/admin/products")
 
     };
     const handleRemoveImage = (indexToRemove) => {
@@ -65,6 +109,8 @@ const EditProduct = () => {
         }));
     };
 
+     if (loading) return <p>Loading...</p>
+    if (error) return <p>Error:{error}</p>
 
 
     return (
@@ -128,7 +174,7 @@ const EditProduct = () => {
                         className='w-full border border-gray-300 rounded-md p-2'
                     />
                 </div>
-                {/* skew */}
+                {/* skeu */}
                 <div className="mb-6">
                     <label className='block font-semibold mb-2'>
                         SKU
@@ -183,7 +229,7 @@ const EditProduct = () => {
                     <input
                         type="text"
                         name="material"  // keeping your state key spelling same as in your object
-                        value={productData.materail}
+                        value={productData.material || ""}
                         onChange={handleChange}
                         required
                         className="w-full border border-gray-300 rounded-md p-2"
@@ -201,9 +247,9 @@ const EditProduct = () => {
                         className="w-full border border-gray-300 rounded-md p-2 bg-white"
                     >
                         <option value="">Select category</option>
-                        <option value="shoes">Mens</option>
+                        <option value="shoes">Men</option>
                         <option value="clothing">Women</option>
-                        <option value="accessories">Sub Women</option>
+                        <option value="accessories">Unisex</option>
                     </select>
                 </div>
                 {/* collection */}
@@ -212,7 +258,7 @@ const EditProduct = () => {
                     <input
                         type="text"
                         name="collection"
-                        value={productData.collection}
+                        value={productData.collection || ""}
                         onChange={handleChange}
                         required
                         className="w-full border border-gray-300 rounded-md p-2"
@@ -252,6 +298,7 @@ const EditProduct = () => {
                         onChange={handleImageUpload}
                         className="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-white p-2"
                     />
+                    {uploading && <p>Uploading Image...</p>}
 
                     {/* Image preview grid */}
                     <div className="flex gap-4 mt-4 flex-wrap">

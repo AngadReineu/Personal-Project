@@ -172,10 +172,7 @@ router.delete("/", async (req, res) => {
 
             // 5️⃣ Save and return updated cart
             await cart.save();
-            return res.status(200).json({
-                message: "Product removed from cart successfully",
-                cart,
-            });
+            return res.status(200).json(cart);
         } else {
             return res
                 .status(404)

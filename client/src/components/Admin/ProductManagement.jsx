@@ -1,25 +1,29 @@
 
 
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { deleteProduct, fetchAdminProducts } from '../../redux/slice/adminProductSlice';
 
 const ProductManagement = () => {
 
-    const products = [
-        {
-            _id: 12231232,
-            name: "rrrzxyz",
-            price: 1122,
-            sku: "123432",
-        },
+    const dispatch = useDispatch();
+    const { products, loading, error } = useSelector((state) => state.adminProducts);
 
-    ];
-    const handleDeleteProduct = (id)=>{
-        if(window.confirm("Are You Sure You Want to Delete This Product?")){
-            console.log("deleted product with id", id);
-            
+
+    useEffect(() => {
+        dispatch(fetchAdminProducts());
+    }, [dispatch])
+
+    const handleDeleteProduct = (id) => {
+        if (window.confirm("Are You Sure You Want to Delete This Product?")) {
+            dispatch(deleteProduct(id))
+
         }
-    }
+    };
+
+    if (loading) return <p>Loading...</p>
+    if (error) return <p>Error:{error}</p>
 
 
 
@@ -29,36 +33,50 @@ const ProductManagement = () => {
             <h2 className="text-2xl font-bold mb-6">
                 Product Management
             </h2>
+
             <div className="overflow-x-auto shadow-md sm:rounded-lg">
                 <table className='min-w-full text-left text-gray-500'>
-                    <th className='bg-gray-100 text-xs uppercase text-gray-700'>
+                    <thead className='bg-gray-100 text-xs uppercase text-gray-700'>
                         <tr>
                             <th className="py-3 px-4">Name</th>
                             <th className="py-3 px-4">Price</th>
-                            <th className="py-3 px-4">Skew</th>
+                            <th className="py-3 px-4">Sku</th>
                             <th className="py-3 px-4">Action</th>
                         </tr>
-                    </th>
-                </table>
+                    </thead>
 
-                <tbody>
-                    {
-                        products.length > 0 ? (
-                            products.map((product) => {
-                                return <tr key={product._id} className='border-b hover:bg-gray-50 cursor-pointer'>
+                    <tbody>
+                        {products.length > 0 ? (
+                            products.map((product) => (
+                                <tr key={product._id} className='border-b hover:bg-gray-50 cursor-pointer'>
                                     <td className='p-4 font-medium text-gray-900 whitespace-nowrap'>{product.name}</td>
-                                    <td className="p-4">₹{product.price}</td>
-                                    <td className="p-4">{product.skew}</td>
-                                    <td className="p-4"><Link to={`/admin/products/${product._id}/edit`} className='bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600'>
-                                        EDIT
-                                    </Link>
-                                    <button className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" onClick={()=>handleDeleteProduct(product._id)}>DELETE</button></td>
+                                    <td className="p-4">₹{product.price.toFixed(2)}</td>
+                                    <td className="p-4">{product.sku}</td>
+                                    <td className="p-4">
+                                        <Link
+                                            to={`/admin/products/${product._id}/edit`}
+                                            className='bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600'
+                                        >
+                                            EDIT
+                                        </Link>
+                                        <button
+                                            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                                            onClick={() => handleDeleteProduct(product._id)}
+                                        >
+                                            DELETE
+                                        </button>
+                                    </td>
                                 </tr>
-                            })
-                        ) : (<tr> <td colSpan={4} className='p-4 text-center text-gray-500'>
-                            No Product Found.</td></tr>)
-                    }
-                </tbody>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={4} className='p-4 text-center text-gray-500'>
+                                    No Product Found.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
         </div>
     )

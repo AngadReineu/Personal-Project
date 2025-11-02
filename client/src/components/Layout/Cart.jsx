@@ -48,7 +48,11 @@ function Cart({ draw, setDraw, toggleCartDrawer }) {
             {/* ?checkoutbutton */}
             <div className="p-4 bg-white sticky bottom-0">
                 {cart && cart?.products?.length > 0 && (
+
                     <>
+                        <p className="text-right text-lg font-semibold mb-2">
+                            Total: ${cart.totalPrice?.toLocaleString() || 0}
+                        </p>
                         <button onClick={handleCheckOut} className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition">Checkout</button>
                         <p className="text-sm tracking-tighter text-gray-500 mt-2 text-center">
                             Shipping,taxes and discount codes calculated at the chekcout.
