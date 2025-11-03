@@ -19,6 +19,8 @@ import EditProduct from "./components/Admin/EditProduct";
 import OrderManagement from "./components/Admin/OrderManagement";
 import ProductCreation from "./components/Admin/ProductCreation";
 import ProtectedRoute from "./components/Common/ProtectedRoute";
+import ForgotPassPage from "./pages/ForgotPassPage";
+import ResetPassPage from "./pages/ResetPassPage";
 
 function App() {
 
@@ -31,6 +33,8 @@ function App() {
                {/*User Layout*/}
                <Route index element={<HomePage />} />
                <Route path="login" element={<Login />} />
+               <Route path="forgot-password" element={<ForgotPassPage />} />
+               <Route path="reset-password/:token" element={<ResetPassPage />} />
                <Route path="register" element={<Register />} />
                <Route path="profile" element={<Profile />} />
                <Route path="collections/:collection" element={<Collection />} />

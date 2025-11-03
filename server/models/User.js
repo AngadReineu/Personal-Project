@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema(
             required:true,
             unique: true,
             trim: true,
+            lowercase: true,
             match: [/.+\@.+\..+/,"Please enter a valid email address"],
         },
         password:{
@@ -26,6 +27,8 @@ const userSchema = new mongoose.Schema(
             minLength: 6,
 
         },
+        resetPasswordToken: String,
+        resetPasswordExpire: Date,
 
         role: {
             type: String,

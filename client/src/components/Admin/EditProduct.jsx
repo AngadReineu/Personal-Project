@@ -99,7 +99,7 @@ const EditProduct = () => {
     const handleFormEdit = (e) => {
         e.preventDefault();
        dispatch(updateProduct({id,productData}));
-       navigate("/admin/products")
+       navigate("/admin/products-management")
 
     };
     const handleRemoveImage = (indexToRemove) => {

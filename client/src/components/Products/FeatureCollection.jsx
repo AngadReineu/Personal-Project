@@ -2,7 +2,7 @@
 
 
 import { Link } from 'react-router-dom'
-import featuredPic from "../../assets/ice.jpg"
+import featuredPic from "../../assets/Car HEro 1.jpg"
 
 
 
